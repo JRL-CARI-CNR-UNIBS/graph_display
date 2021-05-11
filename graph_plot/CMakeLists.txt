@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES graph_plot
- CATKIN_DEPENDS graph_core roscore rosparam_utilities
+ CATKIN_DEPENDS graph_core roscpp rosparam_utilities
  DEPENDS
 )
 
@@ -23,4 +23,3 @@ add_dependencies(plot_paths ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTE
 target_link_libraries(plot_paths
   ${catkin_LIBRARIES}
 )
-
