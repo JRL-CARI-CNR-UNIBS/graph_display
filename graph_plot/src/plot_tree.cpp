@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "plot_tree");
   ros::NodeHandle nh;
-  ros::NodeHandle pnh("");
+  ros::NodeHandle pnh("~");
 
   std::string group_name;
   if (!pnh.getParam("group_name",group_name))
