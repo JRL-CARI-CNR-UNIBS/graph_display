@@ -36,6 +36,11 @@ int main(int argc, char **argv)
   display_path.clearMarkers();
 
   std::string tree_name="tree";
+  if (!nh.getParam("plot_tree_name",tree_name))
+  {
+    ROS_ERROR("plot_tree_name is not defined");
+    return 0;
+  }
   double maximum_distance=0.1;
   XmlRpc::XmlRpcValue p;
   if (!nh.getParam(tree_name,p))
