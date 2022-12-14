@@ -24,6 +24,12 @@ target_link_libraries(plot_paths
   ${catkin_LIBRARIES}
 )
 
+add_executable(plot_tree src/plot_tree.cpp)
+add_dependencies(plot_tree ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(plot_tree
+  ${catkin_LIBRARIES}
+)
+
 add_executable(plot_ik src/plot_ik.cpp)
 add_dependencies(plot_ik ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(plot_ik
