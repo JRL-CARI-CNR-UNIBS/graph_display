@@ -15,9 +15,9 @@ int main(int argc, char **argv)
   ros::NodeHandle pnh("");
 
   std::string group_name;
-  if (!pnh.getParam("move_group",group_name))
+  if (!pnh.getParam("group_name",group_name))
   {
-    ROS_ERROR("move_group is not defined");
+    ROS_ERROR("%s/move_group is not defined",pnh.getNamespace().c_str());
     return 0;
   }
 
@@ -38,7 +38,7 @@ int main(int argc, char **argv)
   std::string tree_name="tree";
   if (!nh.getParam("plot_tree_name",tree_name))
   {
-    ROS_ERROR("plot_tree_name is not defined");
+    ROS_ERROR("%s/plot_tree_name is not defined",pnh.getNamespace().c_str());
     return 0;
   }
   double maximum_distance=0.1;
