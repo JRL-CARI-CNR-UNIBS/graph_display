@@ -32,11 +32,11 @@ int main(int argc, char **argv)
   std::string what;
 
 
-  pathplan::Display display_path(planning_scene,group_name);
+  pathplan::Display display_path(planning_scene,group_name,"flange");
   display_path.clearMarkers();
 
   std::string tree_name="tree";
-  if (!nh.getParam("plot_tree_name",tree_name))
+  if (!pnh.getParam("plot_tree_name",tree_name))
   {
     ROS_ERROR("%s/plot_tree_name is not defined",pnh.getNamespace().c_str());
     return 0;
