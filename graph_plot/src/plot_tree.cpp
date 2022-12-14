@@ -17,7 +17,7 @@ int main(int argc, char **argv)
   std::string group_name;
   if (!pnh.getParam("group_name",group_name))
   {
-    ROS_ERROR("%s/move_group is not defined",pnh.getNamespace().c_str());
+    ROS_ERROR("%s/group_name is not defined",pnh.getNamespace().c_str());
     return 0;
   }
 

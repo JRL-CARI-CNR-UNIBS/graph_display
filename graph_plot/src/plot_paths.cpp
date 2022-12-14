@@ -12,14 +12,15 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "plot_paths");
   ros::NodeHandle nh;
-  ros::NodeHandle pnh;
+  ros::NodeHandle pnh("~");
 
   std::string group_name;
-  if (!pnh.getParam("move_group",group_name))
+  if (!pnh.getParam("group_name",group_name))
   {
-    ROS_ERROR("move_group is not defined");
+    ROS_ERROR("%s/group_name is not defined",pnh.getNamespace().c_str());
     return 0;
   }
+
 
   moveit::planning_interface::MoveGroupInterface move_group(group_name);
   robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
@@ -50,7 +51,7 @@ int main(int argc, char **argv)
   {
     std::vector<Eigen::VectorXd> waypoints;
 
-    if (!rosparam_utilities::getParam(pnh,path_name+"/positions",waypoints,what))
+    if (!rosparam_utilities::getParam(pnh,path_name,waypoints,what))
     {
       ROS_ERROR("Parameter %s/%s/positions is not correct.",pnh.getNamespace().c_str(),path_name.c_str());
       break;
