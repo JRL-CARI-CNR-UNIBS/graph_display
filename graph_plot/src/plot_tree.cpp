@@ -32,7 +32,7 @@ int main(int argc, char **argv)
   std::string what;
 
 
-  pathplan::Display display_path(planning_scene,group_name,"flange");
+  pathplan::Display display_path(planning_scene,group_name,"tool");
   display_path.clearMarkers();
 
   std::string tree_name="tree";
