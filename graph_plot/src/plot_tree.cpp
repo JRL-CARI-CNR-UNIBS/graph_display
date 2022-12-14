@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "plot_tree");
   ros::NodeHandle nh;
-  ros::NodeHandle pnh;
+  ros::NodeHandle pnh("");
 
   std::string group_name;
   if (!pnh.getParam("move_group",group_name))
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
   }
   double maximum_distance=0.1;
   XmlRpc::XmlRpcValue p;
-  if (!nh.getParam(tree_name,p))
+  if (!pnh.getParam(tree_name,p))
   {
     ROS_ERROR("%s is unable to load trees",pnh.getNamespace().c_str());
     return 0;
