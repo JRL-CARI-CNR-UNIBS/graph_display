@@ -35,22 +35,39 @@ int main(int argc, char **argv)
   pathplan::Display display_path(planning_scene,group_name);
   display_path.clearMarkers();
 
-  std::string tree_name="tree";
-  if (!pnh.getParam("plot_tree_name",tree_name))
+  std::vector<std::string> tree_names;
+  if (!pnh.getParam("plot_tree_names",tree_names))
   {
     ROS_ERROR("%s/plot_tree_name is not defined",pnh.getNamespace().c_str());
     return 0;
   }
   double maximum_distance=0.1;
-  XmlRpc::XmlRpcValue p;
-  if (!pnh.getParam(tree_name,p))
-  {
-    ROS_ERROR("%s is unable to load trees",pnh.getNamespace().c_str());
-    return 0;
-  }
-  pathplan::TreePtr tree=pathplan::Tree::fromXmlRpcValue(p,maximum_distance,checker,metrics,true);
 
-  display_path.displayTree(tree);
+
+  ros::Rate lp(1);
+  while (ros::ok())
+  {
+    for (std::string& tree_name: tree_names)
+    {
+      if (!ros::ok())
+        break;
+
+      XmlRpc::XmlRpcValue p;
+      if (!pnh.getParam(tree_name,p))
+      {
+        ROS_DEBUG("%s is unable to load trees",pnh.getNamespace().c_str());
+        continue;
+      }
+      pathplan::TreePtr tree=pathplan::Tree::fromXmlRpcValue(p,maximum_distance,checker,metrics,true);
+      if (tree)
+      {
+        display_path.clearMarkers();
+        display_path.displayTree(tree);
+
+        lp.sleep();
+      }
+    }
+  }
 
 
   ros::spin();

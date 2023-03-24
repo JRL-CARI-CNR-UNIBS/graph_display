@@ -47,23 +47,29 @@ int main(int argc, char **argv)
   std::vector<int> path_ids;
   std::vector<std::vector<double>> path_colors;
 
+  std::vector<double> color;
+  color={1,0,0,1};
   for ( std::string path_name: path_names)
   {
     std::vector<Eigen::VectorXd> waypoints;
 
     if (!rosparam_utilities::getParam(pnh,path_name,waypoints,what))
     {
-      ROS_ERROR("Parameter %s/%s/positions is not correct.",pnh.getNamespace().c_str(),path_name.c_str());
-      break;
+      ROS_DEBUG("Path %s is not correct.",path_name.c_str());
+      continue;
     }
     if (waypoints.size()<=1)
-      break;
+      continue;
 
-    std::vector<double> color;
+
+
     if (!pnh.getParam(path_name+"/color",color))
     {
-      ROS_INFO("path %s has no color, using red",path_name.c_str());
-      color={1,0,0,1};
+      ROS_DEBUG("path %s has no color, using red",path_name.c_str());
+      double tmp=color.at(0);
+      color.at(0)=color.at(1);
+      color.at(1)=color.at(2);
+      color.at(2)=tmp;
     }
     assert(color.size()==4);
     path_colors.push_back(color);
