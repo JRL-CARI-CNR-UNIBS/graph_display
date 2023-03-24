@@ -26,22 +26,24 @@ if __name__ == "__main__":
     r = rospy.Rate(10) # all solution in 10 seconds
     first_time=True
     last_c=[]
-    for idx in range(0,len(display_path)):
-        try:
-            path=rospy.get_param(display_path[idx])
-        except:
-            continue
 
+    while (not rospy.is_shutdown()):
+        for idx in range(0,len(display_path)):
+            try:
+                path=rospy.get_param(display_path[idx])
+            except:
+                print("problems loading path")
+                continue
 
-        for c in path:
-            if first_time:
-                first_time=False
+            for c in path:
+                if first_time:
+                    first_time=False
+                    last_c=c
+                ik_sol.state.joint_state.position=c
+                state_pub.publish(ik_sol)
+                distance=max([abs(j-i) for i, j in zip(c, last_c)])
+                rospy.sleep(min(0.1,0.1*distance))
                 last_c=c
-            ik_sol.state.joint_state.position=c
-            state_pub.publish(ik_sol)
-            distance=max([abs(j-i) for i, j in zip(c, last_c)])
-            rospy.sleep(min(0.1,0.5*distance))
-            last_c=c
 
-            if rospy.is_shutdown():
-                exit()
+                if rospy.is_shutdown():
+                    exit()
