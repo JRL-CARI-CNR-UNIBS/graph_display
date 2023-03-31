@@ -42,7 +42,7 @@ if __name__ == "__main__":
                 ik_sol.state.joint_state.position=c
                 state_pub.publish(ik_sol)
                 distance=max([abs(j-i) for i, j in zip(c, last_c)])
-                rospy.sleep(min(0.1,0.1*distance))
+                rospy.sleep(min(0.1,0.5*distance))
                 last_c=c
 
                 if rospy.is_shutdown():
