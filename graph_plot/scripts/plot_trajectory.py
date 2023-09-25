@@ -28,12 +28,11 @@ if __name__ == "__main__":
             print(f"problems loading path {path}")
             continue
         first_time = True  # true if first point
-        print(f"point:\n{points}")
+        print(f"point:\n{ len(points)}")
         trj = RobotTrajectory()
         trj.joint_trajectory.joint_names = joint_name
         trj.joint_trajectory.header.frame_id="world"
         for c in points:
-            print(f"point: {c}")
             if first_time:
                 first_time = False
                 last_c = c
@@ -53,7 +52,6 @@ if __name__ == "__main__":
         display_trj = DisplayTrajectory()
         display_trj.trajectory.append(trj)
         display_trj.trajectory_start = state
-        print(f"display trajectory: {display_trj}")
         pubs[path].publish(display_trj)
         pubs[path].publish(display_trj)
 
