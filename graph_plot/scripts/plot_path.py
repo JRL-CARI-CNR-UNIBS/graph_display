@@ -9,14 +9,10 @@ import sys
 
 
 if __name__ == "__main__":
-    rospy.init_node('get_ik')
+    rospy.init_node('plot_path')
 
-
-
-
-
-    display_path=rospy.get_param("/plot_paths/display_path")
-    jname=rospy.get_param("/goals/node_0/joint_names")
+    display_path=rospy.get_param("~display_path")
+    jname=rospy.get_param("joint_names")
     ik_sol=moveit_msgs.msg.DisplayRobotState()
     ik_sol.state.joint_state.name=jname
     ik_sol.state.joint_state.velocity= [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
