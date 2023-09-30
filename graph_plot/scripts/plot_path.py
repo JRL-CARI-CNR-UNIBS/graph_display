@@ -19,7 +19,7 @@ if __name__ == "__main__":
     ik_sol.state.joint_state.effort= [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     state_pub = rospy.Publisher('/path',moveit_msgs.msg.DisplayRobotState,queue_size=10)
 
-    r = rospy.Rate(10) # all solution in 10 seconds
+    #r = rospy.Rate(10) # all solution in 10 seconds
     first_time=True
     last_c=[]
 
