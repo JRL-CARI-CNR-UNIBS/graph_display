@@ -6,8 +6,9 @@ from moveit_msgs.msg import DisplayTrajectory
 from moveit_msgs.msg import RobotTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
 
-if __name__ == "__main__":
-    rospy.init_node('get_ik')
+from std_srvs.srv import Trigger, TriggerRequest, TriggerResponse
+
+def plot_trajectory(req: TriggerRequest) -> TriggerResponse:
 
     display_path = rospy.get_param("~display_path")
     joint_name = rospy.get_param("joint_names")
@@ -20,7 +21,10 @@ if __name__ == "__main__":
     pubs = dict()
 
     for path in display_path:
+        rospy.loginfo(f'***** PLOT TRAJECTORY {path} ********')
         pubs[path] = rospy.Publisher(path, DisplayTrajectory, queue_size=10, latch=True)
+
+
 
         try:
             points = rospy.get_param("~"+path)
@@ -54,5 +58,13 @@ if __name__ == "__main__":
         display_trj.trajectory_start = state
         pubs[path].publish(display_trj)
         pubs[path].publish(display_trj)
+    
+    return TriggerResponse()
 
+
+if __name__ == "__main__":
+    rospy.init_node('plot_trajectory')
+
+    _ = rospy.Service('/start_plot_trajectory', Trigger, plot_trajectory)
+        
     rospy.spin()
