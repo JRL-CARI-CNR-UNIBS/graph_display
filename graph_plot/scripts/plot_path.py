@@ -12,6 +12,7 @@ if __name__ == "__main__":
     rospy.init_node('plot_path')
 
     display_path=rospy.get_param("~display_path")
+    sleep_time=rospy.get_param("~sleep", 0.1)
     jname=rospy.get_param("joint_names")
     ik_sol=moveit_msgs.msg.DisplayRobotState()
     ik_sol.state.joint_state.name=jname
@@ -38,7 +39,7 @@ if __name__ == "__main__":
                 ik_sol.state.joint_state.position=c
                 state_pub.publish(ik_sol)
                 distance=max([abs(j-i) for i, j in zip(c, last_c)])
-                rospy.sleep(min(0.1,0.5*distance))
+                rospy.sleep(min(sleep_time,0.5*distance))
                 last_c=c
 
                 if rospy.is_shutdown():

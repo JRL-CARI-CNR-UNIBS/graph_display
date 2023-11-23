@@ -24,8 +24,6 @@ def plot_trajectory(req: TriggerRequest) -> TriggerResponse:
         rospy.loginfo(f'***** PLOT TRAJECTORY {path} ********')
         pubs[path] = rospy.Publisher(path, DisplayTrajectory, queue_size=10, latch=True)
 
-
-
         try:
             points = rospy.get_param("~"+path)
         except:
@@ -59,6 +57,7 @@ def plot_trajectory(req: TriggerRequest) -> TriggerResponse:
         pubs[path].publish(display_trj)
         pubs[path].publish(display_trj)
     
+    rospy.loginfo(f'***** PLOT TRAJECTORY DONE {path} ********')
     return TriggerResponse()
 
 
