@@ -8,17 +8,24 @@
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>
 
-int main(int argc, char** argv)
-{
-  ros::init(argc, argv, "plot_paths");
+#include <std_srvs/Trigger.h>
+#include "ros/service_server.h"
+#include "std_srvs/TriggerRequest.h"
+#include "std_srvs/TriggerResponse.h"
 
+#include <thread>
+
+std::thread loop;
+
+void loop_animation()
+{
   ros::NodeHandle pnh("~");
 
   std::string group_name;
   if (!pnh.getParam("group_name", group_name))
   {
     ROS_ERROR("%s/group_name is not defined", pnh.getNamespace().c_str());
-    return 0;
+    return;
   }
 
   moveit::planning_interface::MoveGroupInterface move_group(group_name);
@@ -39,7 +46,7 @@ int main(int argc, char** argv)
   if (!pnh.getParam("display_path", path_names))
   {
     ROS_ERROR("display_path is not defined");
-    return 0;
+    return;
   }
 
   std::vector<pathplan::PathPtr> paths;
@@ -95,7 +102,30 @@ int main(int argc, char** argv)
     }
     lp.sleep();
   }
+}
+
+bool start_display_the_path_markers(std_srvs::TriggerRequest&, std_srvs::TriggerResponse& res)
+{
+  ROS_INFO("Start Display The Markers of the Path!");
+
+  ROS_INFO(".. starting the thread");
+  loop = std::thread(loop_animation);
+  loop.detach();
+
+  res.success = true;
+  ROS_INFO("Ok, to kill the thread, just ctrl+c");
+  return true;
+}
+
+int main(int argc, char** argv)
+{
+  ros::init(argc, argv, "plot_paths");
+
+  ros::NodeHandle pnh("~");
+
+  ros::ServiceServer plot_markers = pnh.advertiseService("/start_markers_path", &start_display_the_path_markers);
+
   ros::spin();
 
-  return 0;
+  return 0;  
 }
