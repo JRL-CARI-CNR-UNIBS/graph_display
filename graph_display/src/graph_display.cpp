@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <graph_display/graph_display.h>
 
-namespace pathplan
+namespace graph_core
 {
 
 Display::Display(const planning_scene::PlanningSceneConstPtr planning_scene,
@@ -123,6 +123,17 @@ int Display::displayNode(const NodePtr &n,
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
 
+  geometry_msgs::Pose pose;
+  pose.position.x = 0;
+  pose.position.y = 0;
+  pose.position.z = 0;
+
+  pose.orientation.x = 0;
+  pose.orientation.y = 0;
+  pose.orientation.z = 0;
+  pose.orientation.w = 1;
+  marker.pose = pose;
+
   marker_pub_.publish(marker);
   return marker.id;
 }
@@ -159,6 +170,17 @@ int Display::displayConnection(const ConnectionPtr& conn,
   marker.color.g = marker_color.at(1);
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
+
+  geometry_msgs::Pose pose;
+  pose.position.x = 0;
+  pose.position.y = 0;
+  pose.position.z = 0;
+
+  pose.orientation.x = 0;
+  pose.orientation.y = 0;
+  pose.orientation.z = 0;
+  pose.orientation.w = 1;
+  marker.pose = pose;
 
   Eigen::VectorXd parent = conn->getParent()->getConfiguration();
   Eigen::VectorXd child = conn->getChild()->getConfiguration();
@@ -238,6 +260,17 @@ int Display::displayPath(const PathPtr &path,
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
 
+  geometry_msgs::Pose pose;
+  pose.position.x = 0;
+  pose.position.y = 0;
+  pose.position.z = 0;
+
+  pose.orientation.x = 0;
+  pose.orientation.y = 0;
+  pose.orientation.z = 0;
+  pose.orientation.w = 1;
+  marker.pose = pose;
+
   std::vector<ConnectionPtr> connections=path->getConnections();
   if (connections.size()==0)
     return marker.id;
@@ -251,7 +284,6 @@ int Display::displayPath(const PathPtr &path,
     Eigen::VectorXd v = (child-parent)/length;
     Eigen::VectorXd conf1 = parent;
     Eigen::VectorXd conf2;
-    geometry_msgs::Pose pose;
 
     for(unsigned int i=1;i<=std::floor(length/MAX_LENGTH); i++)
     {
@@ -324,6 +356,17 @@ std::vector<int> Display::displayPathAndWaypoints(const PathPtr &path,
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
 
+  geometry_msgs::Pose pose;
+  pose.position.x = 0;
+  pose.position.y = 0;
+  pose.position.z = 0;
+
+  pose.orientation.x = 0;
+  pose.orientation.y = 0;
+  pose.orientation.z = 0;
+  pose.orientation.w = 1;
+  marker.pose = pose;
+
   visualization_msgs::Marker marker_wp;
   marker_wp.ns = ns;
   marker_wp.type = visualization_msgs::Marker::SPHERE_LIST;
@@ -340,6 +383,8 @@ std::vector<int> Display::displayPathAndWaypoints(const PathPtr &path,
   marker_wp.color.g = marker_color.at(1);
   marker_wp.color.b = marker_color.at(2);
   marker_wp.color.a = marker_color.at(3);
+
+  marker_wp.pose = pose;
 
   std::vector<int> ids;
   ids.push_back(marker.id);
@@ -438,6 +483,18 @@ int Display::displaySubtree(const SubtreePtr &subtree,
   marker.color.g = marker_color.at(1);
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
+
+  geometry_msgs::Pose pose;
+  pose.position.x = 0;
+  pose.position.y = 0;
+  pose.position.z = 0;
+
+  pose.orientation.x = 0;
+  pose.orientation.y = 0;
+  pose.orientation.z = 0;
+  pose.orientation.w = 1;
+  marker.pose = pose;
+
   displayTreeNode(subtree->getRoot(),subtree,marker.points,true);
 
   marker_pub_.publish(marker);
@@ -474,6 +531,18 @@ int Display::displayTree(const TreePtr &tree,
   marker.color.g = marker_color.at(1);
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
+
+  geometry_msgs::Pose pose;
+  pose.position.x = 0;
+  pose.position.y = 0;
+  pose.position.z = 0;
+
+  pose.orientation.x = 0;
+  pose.orientation.y = 0;
+  pose.orientation.z = 0;
+  pose.orientation.w = 1;
+  marker.pose = pose;
+
   displayTreeNode(tree->getRoot(),tree,marker.points,false);
 
   marker_pub_.publish(marker);
@@ -553,6 +622,18 @@ int Display::displayNet(const NetPtr &net,
   marker.color.g = marker_color.at(1);
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
+
+  geometry_msgs::Pose pose;
+  pose.position.x = 0;
+  pose.position.y = 0;
+  pose.position.z = 0;
+
+  pose.orientation.x = 0;
+  pose.orientation.y = 0;
+  pose.orientation.z = 0;
+  pose.orientation.w = 1;
+  marker.pose = pose;
+
   displayNetNode(net->getTree()->getRoot(),net,marker.points);
 
   marker_pub_.publish(marker);

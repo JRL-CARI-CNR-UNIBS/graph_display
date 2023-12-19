@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <moveit_visual_tools/moveit_visual_tools.h>
 #include <moveit_msgs/DisplayTrajectory.h>
 
-namespace pathplan
+namespace graph_core
 {
 class Display;
 typedef std::shared_ptr<Display> DisplayPtr;
@@ -103,73 +103,70 @@ public:
     connection_marker_scale_ = {DEFAULT_CONNECTION_SIZE, DEFAULT_CONNECTION_SIZE, DEFAULT_CONNECTION_SIZE};
   }
 
-  void clearMarkers(const std::string &ns="pathplan");
-  void clearMarker(const int& id,const std::string& ns="pathplan");
+  void clearMarkers(const std::string &ns="graph_display");
+  void clearMarker(const int& id,const std::string& ns="graph_display");
   int displayNode(const NodePtr& n,
-                  const std::string& ns="pathplan",
+                  const std::string& ns="graph_display",
                   const std::vector<double>& marker_color = {1,0,0,1.0},
                   const bool& plot_state=false);
   int displayNode(const NodePtr& n,
                   const int &static_id,
-                  const std::string& ns="pathplan",
+                  const std::string& ns="graph_display",
                   const std::vector<double>& marker_color = {1,0,0,1.0},
                   const bool& plot_state=false);
   int displayConnection(const ConnectionPtr& conn,
-                        const std::string& ns="pathplan",
+                        const std::string& ns="graph_display",
                         const std::vector<double>& marker_color= {1,0,0,1.0},
                         const bool& plot_state=false);
   int displayConnection(const ConnectionPtr& conn,
                         const int &static_id,
-                        const std::string& ns="pathplan",
+                        const std::string& ns="graph_display",
                         const std::vector<double>& marker_color= {1,0,0,1.0},
                         const bool& plot_state=false);
   int displayPath(const PathPtr& path,
-                  const std::string& ns="pathplan",
+                  const std::string& ns="graph_display",
                   const std::vector<double>& marker_color= {1,0,0,1.0},
                   const bool& plot_state=false);
   int displayPath(const PathPtr& path,
                   const int &static_id,
-                  const std::string& ns="pathplan",
+                  const std::string& ns="graph_display",
                   const std::vector<double>& marker_color= {1,0,0,1.0},
                   const bool& plot_state=false);
   std::vector<int> displayPathAndWaypoints(const PathPtr& path,
-                                           const std::string& ns="pathplan",
+                                           const std::string& ns="graph_display",
                                            const std::vector<double>& marker_color= {1,0,0,1.0},
                                            const bool& plot_state=false);
   std::vector<int> displayPathAndWaypoints(const PathPtr& path,
                                            const int &static_id_path,
                                            const int &static_id_wp,
-                                           const std::string& ns="pathplan",
+                                           const std::string& ns="graph_display",
                                            const std::vector<double>& marker_color= {1,0,0,1.0},
                                            const bool& plot_state=false);
   int displayTree(const TreePtr& tree,
-                  const std::string& ns="pathplan",
+                  const std::string& ns="graph_display",
                   const std::vector<double>& marker_color= {1,0,0,1.0});
   int displayTree(const TreePtr& tree,
                   const int &static_id,
-                  const std::string& ns="pathplan",
+                  const std::string& ns="graph_display",
                   const std::vector<double>& marker_color= {1,0,0,1.0});
 
   int displayNet(const NetPtr& net,
-                 const std::string& ns="pathplan",
+                 const std::string& ns="graph_display",
                  const std::vector<double>& marker_color= {1,0,0,1.0});
   int displayNet(const NetPtr& net,
                  const int &static_id,
-                 const std::string& ns="pathplan",
+                 const std::string& ns="graph_display",
                  const std::vector<double>& marker_color= {1,0,0,1.0});
 
   int displaySubtree(const SubtreePtr& subtree,
-                     const std::string& ns="pathplan",
+                     const std::string& ns="graph_display",
                      const std::vector<double>& marker_color= {1,0,0,1.0});
   int displaySubtree(const SubtreePtr& subtree,
                      const int &static_id,
-                     const std::string& ns="pathplan",
+                     const std::string& ns="graph_display",
                      const std::vector<double>& marker_color= {1,0,0,1.0});
 
   void nextButton(const std::string& string="Press Next");
 
 };
 }
-
-
-
