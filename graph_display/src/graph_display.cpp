@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <graph_display/graph_display.h>
 
-namespace graph_core
+namespace graph_display
 {
 
 Display::Display(const planning_scene::PlanningSceneConstPtr planning_scene,

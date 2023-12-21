@@ -35,12 +35,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <moveit_visual_tools/moveit_visual_tools.h>
 #include <moveit_msgs/DisplayTrajectory.h>
 
-namespace graph_core
+namespace graph_display
 {
+using namespace graph_core;
+
 class Display;
 typedef std::shared_ptr<Display> DisplayPtr;
 class Display: public std::enable_shared_from_this<Display>
 {
+
 #define DISPLAY_TIME 0.0001
 #define DEFAULT_NODE_SIZE 0.02
 #define DEFAULT_CONNECTION_SIZE 0.005
