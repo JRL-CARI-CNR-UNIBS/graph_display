@@ -2,6 +2,7 @@
 #include <graph_core/graph/path.h>
 #include <graph_core/cube_3d_collision_checker.h>
 #include <graph_display/graph_display.h>
+#include <cnr_logger/cnr_logger.h>
 
 #include <rosparam_utilities/rosparam_utilities.h>
 #include <moveit/planning_interface/planning_interface.h>
@@ -28,14 +29,26 @@ void loop_animation()
     return;
   }
 
+  std::string package_name = "graph_plot";
+  std::string package_path = ros::package::getPath(package_name);
+
+  if (package_path.empty())
+  {
+    ROS_ERROR_STREAM("Failed to get path for package '" << package_name);
+    return;
+  }
+
+  std::string logger_file = package_path+"/config/logger_param.yaml";
+  cnr_logger::TraceLoggerPtr logger = std::make_shared<cnr_logger::TraceLogger>("plot_paths",logger_file);
+
   moveit::planning_interface::MoveGroupInterface move_group(group_name);
   robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
   robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
   planning_scene::PlanningScenePtr planning_scene = std::make_shared<planning_scene::PlanningScene>(kinematic_model);
   graph_core::CollisionCheckerPtr checker =
-      std::make_shared<graph_core::MoveitCollisionChecker>(planning_scene, group_name);
+      std::make_shared<graph_core::Cube3dCollisionChecker>(logger);
 
-  graph_core::MetricsPtr metrics = std::make_shared<graph_core::Metrics>();
+  graph_core::MetricsPtr metrics = std::make_shared<graph_core::Metrics>(logger);
 
   std::string what;
 
@@ -83,12 +96,12 @@ void loop_animation()
     for (size_t idx = 1; idx < waypoints.size(); idx++)
     {
       graph_core::NodePtr n2 = std::make_shared<graph_core::Node>(waypoints.at(idx));
-      graph_core::ConnectionPtr conn = std::make_shared<graph_core::Connection>(n1, n2);
+      graph_core::ConnectionPtr conn = std::make_shared<graph_core::Connection>(n1, n2, logger);
       conns.push_back(conn);
       n1 = n2;
     }
 
-    graph_core::PathPtr path = std::make_shared<graph_core::Path>(conns, metrics, checker);
+    graph_core::PathPtr path = std::make_shared<graph_core::Path>(conns, metrics, checker, logger);
     paths.push_back(path);
     path_ids.push_back(display_path.displayPath(path, paths.size()));
   }

@@ -21,19 +21,41 @@ int main(int argc, char **argv)
     return 0;
   }
 
+  std::string package_name = "graph_plot";
+  std::string package_path = ros::package::getPath(package_name);
+
+  if (package_path.empty())
+  {
+    ROS_ERROR_STREAM("Failed to get path for package '" << package_name);
+    return 0;
+  }
+
+  std::string logger_file = package_path+"/config/logger_param.yaml";
+  cnr_logger::TraceLoggerPtr logger = std::make_shared<cnr_logger::TraceLogger>("plot_tree",logger_file);
+
+
   moveit::planning_interface::MoveGroupInterface move_group(group_name);
   robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
   robot_model::RobotModelPtr       kinematic_model = robot_model_loader.getModel();
   planning_scene::PlanningScenePtr planning_scene = std::make_shared<planning_scene::PlanningScene>(kinematic_model);
-  graph_core::CollisionCheckerPtr checker = std::make_shared<graph_core::MoveitCollisionChecker>(planning_scene, group_name);
+  graph_core::CollisionCheckerPtr checker = std::make_shared<graph_core::Cube3dCollisionChecker>(logger);
 
-  graph_core::MetricsPtr metrics=std::make_shared<graph_core::Metrics>();
+  graph_core::MetricsPtr metrics=std::make_shared<graph_core::Metrics>(logger);
 
   std::string what;
 
 
   graph_display::Display display_path(planning_scene,group_name);
   display_path.clearMarkers();
+
+  YAML::Node config;
+
+  try {
+    config = YAML::LoadFile(package_path+"/config/trees.yaml");
+  } catch (const YAML::Exception& e) {
+    ROS_ERROR_STREAM("Error loading YAML file: "<<e.what());
+    return 0;
+  }
 
   std::vector<std::string> tree_names;
   if (!pnh.getParam("plot_tree_names",tree_names))
@@ -52,13 +74,16 @@ int main(int argc, char **argv)
       if (!ros::ok())
         break;
 
-      XmlRpc::XmlRpcValue p;
-      if (!pnh.getParam(tree_name,p))
+      YAML::Node p;
+      if (config[tree_name])
+        p = config[tree_name];
+      else
       {
-        ROS_DEBUG("%s is unable to load trees",pnh.getNamespace().c_str());
-        continue;
+        ROS_ERROR_STREAM("Unable to load "<<tree_name);
+        return 0;
       }
-      graph_core::TreePtr tree=graph_core::Tree::fromXmlRpcValue(p,maximum_distance,checker,metrics,true);
+
+      graph_core::TreePtr tree=graph_core::Tree::fromYAML(p,maximum_distance,checker,metrics,logger,true);
       if (tree)
       {
         display_path.clearMarkers();
