@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <graph_core/graph/path.h>
-#include <graph_core/moveit_collision_checker.h>
+#include <graph_core/cube_3d_collision_checker.h>
 #include <graph_display/graph_display.h>
 
 #include <rosparam_utilities/rosparam_utilities.h>
@@ -25,14 +25,14 @@ int main(int argc, char **argv)
   robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
   robot_model::RobotModelPtr       kinematic_model = robot_model_loader.getModel();
   planning_scene::PlanningScenePtr planning_scene = std::make_shared<planning_scene::PlanningScene>(kinematic_model);
-  pathplan::CollisionCheckerPtr checker = std::make_shared<pathplan::MoveitCollisionChecker>(planning_scene, group_name);
+  graph_core::CollisionCheckerPtr checker = std::make_shared<graph_core::MoveitCollisionChecker>(planning_scene, group_name);
 
-  pathplan::MetricsPtr metrics=std::make_shared<pathplan::Metrics>();
+  graph_core::MetricsPtr metrics=std::make_shared<graph_core::Metrics>();
 
   std::string what;
 
 
-  pathplan::Display display_path(planning_scene,group_name);
+  graph_display::Display display_path(planning_scene,group_name);
   display_path.clearMarkers();
 
   std::vector<std::string> tree_names;
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
         ROS_DEBUG("%s is unable to load trees",pnh.getNamespace().c_str());
         continue;
       }
-      pathplan::TreePtr tree=pathplan::Tree::fromXmlRpcValue(p,maximum_distance,checker,metrics,true);
+      graph_core::TreePtr tree=graph_core::Tree::fromXmlRpcValue(p,maximum_distance,checker,metrics,true);
       if (tree)
       {
         display_path.clearMarkers();

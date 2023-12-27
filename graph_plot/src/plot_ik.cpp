@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <graph_core/graph/path.h>
-#include <graph_core/moveit_collision_checker.h>
+#include <graph_core/cube_3d_collision_checker.h>
 #include <graph_display/graph_display.h>
 
 #include <rosparam_utilities/rosparam_utilities.h>

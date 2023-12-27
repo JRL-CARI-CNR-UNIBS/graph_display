@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <graph_core/graph/path.h>
-#include <graph_core/moveit_collision_checker.h>
+#include <graph_core/cube_3d_collision_checker.h>
 #include <graph_display/graph_display.h>
 
 #include <rosparam_utilities/rosparam_utilities.h>
@@ -32,14 +32,14 @@ void loop_animation()
   robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
   robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
   planning_scene::PlanningScenePtr planning_scene = std::make_shared<planning_scene::PlanningScene>(kinematic_model);
-  pathplan::CollisionCheckerPtr checker =
-      std::make_shared<pathplan::MoveitCollisionChecker>(planning_scene, group_name);
+  graph_core::CollisionCheckerPtr checker =
+      std::make_shared<graph_core::MoveitCollisionChecker>(planning_scene, group_name);
 
-  pathplan::MetricsPtr metrics = std::make_shared<pathplan::Metrics>();
+  graph_core::MetricsPtr metrics = std::make_shared<graph_core::Metrics>();
 
   std::string what;
 
-  pathplan::Display display_path(planning_scene, group_name);
+  graph_display::Display display_path(planning_scene, group_name);
   display_path.clearMarkers();
 
   std::vector<std::string> path_names;
@@ -49,7 +49,7 @@ void loop_animation()
     return;
   }
 
-  std::vector<pathplan::PathPtr> paths;
+  std::vector<graph_core::PathPtr> paths;
   std::vector<int> path_ids;
   std::vector<std::vector<double>> path_colors;
 
@@ -78,17 +78,17 @@ void loop_animation()
     assert(color.size() == 4);
     path_colors.push_back(color);
 
-    pathplan::NodePtr n1 = std::make_shared<pathplan::Node>(waypoints.at(0));
-    std::vector<pathplan::ConnectionPtr> conns;
+    graph_core::NodePtr n1 = std::make_shared<graph_core::Node>(waypoints.at(0));
+    std::vector<graph_core::ConnectionPtr> conns;
     for (size_t idx = 1; idx < waypoints.size(); idx++)
     {
-      pathplan::NodePtr n2 = std::make_shared<pathplan::Node>(waypoints.at(idx));
-      pathplan::ConnectionPtr conn = std::make_shared<pathplan::Connection>(n1, n2);
+      graph_core::NodePtr n2 = std::make_shared<graph_core::Node>(waypoints.at(idx));
+      graph_core::ConnectionPtr conn = std::make_shared<graph_core::Connection>(n1, n2);
       conns.push_back(conn);
       n1 = n2;
     }
 
-    pathplan::PathPtr path = std::make_shared<pathplan::Path>(conns, metrics, checker);
+    graph_core::PathPtr path = std::make_shared<graph_core::Path>(conns, metrics, checker);
     paths.push_back(path);
     path_ids.push_back(display_path.displayPath(path, paths.size()));
   }
@@ -98,7 +98,7 @@ void loop_animation()
   {
     for (size_t idx = 0; idx < paths.size(); idx++)
     {
-      path_ids.at(idx) = display_path.displayPath(paths.at(idx), path_ids.at(idx), "pathplan", path_colors.at(idx));
+      path_ids.at(idx) = display_path.displayPath(paths.at(idx), path_ids.at(idx), "graph_display", path_colors.at(idx));
     }
     lp.sleep();
   }

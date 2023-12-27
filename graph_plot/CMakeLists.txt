@@ -13,7 +13,7 @@ find_package(graph_core REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES graph_plot
- CATKIN_DEPENDS roscpp rosparam_utilities graph_display
+ CATKIN_DEPENDS roscpp rosparam_utilities graph_display graph_ros1
  DEPENDS graph_core
 )
 
