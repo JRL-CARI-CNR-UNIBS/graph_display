@@ -1,7 +1,8 @@
 #include <ros/ros.h>
 #include <graph_core/graph/path.h>
-#include <graph_core/cube_3d_collision_checker.h>
+#include <graph_core/collision_checkers/cube_3d_collision_checker.h>
 #include <graph_display/graph_display.h>
+#include <graph_core/metrics/euclidean_metrics.h>
 
 #include <rosparam_utilities/rosparam_utilities.h>
 #include <moveit/planning_interface/planning_interface.h>
@@ -40,7 +41,7 @@ int main(int argc, char **argv)
   planning_scene::PlanningScenePtr planning_scene = std::make_shared<planning_scene::PlanningScene>(kinematic_model);
   graph::core::CollisionCheckerPtr checker = std::make_shared<graph::core::Cube3dCollisionChecker>(logger);
 
-  graph::core::MetricsPtr metrics=std::make_shared<graph::core::Metrics>(logger);
+  graph::core::MetricsPtr metrics=std::make_shared<graph::core::EuclideanMetrics>(logger);
 
   std::string what;
 
