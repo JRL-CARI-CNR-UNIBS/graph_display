@@ -27,7 +27,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <graph_display/graph_display.h>
 
-namespace graph_display
+namespace graph
+{
+namespace display
 {
 
 Display::Display(const planning_scene::PlanningSceneConstPtr planning_scene,
@@ -677,4 +679,5 @@ void Display::nextButton(const std::string& string)
   visual_tools->loadRemoteControl();
   visual_tools->prompt(string);
 }
-}
+} //end namespace display
+} //end namespace graph

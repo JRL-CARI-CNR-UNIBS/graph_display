@@ -35,9 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <moveit_visual_tools/moveit_visual_tools.h>
 #include <moveit_msgs/DisplayTrajectory.h>
 
-namespace graph_display
+namespace graph
 {
-using namespace graph_core;
+namespace display
+{
+
+using namespace graph::core;
 
 class Display;
 typedef std::shared_ptr<Display> DisplayPtr;
@@ -172,4 +175,5 @@ public:
   void nextButton(const std::string& string="Press Next");
 
 };
-}
+} //end namespace display
+} //end namespace graph

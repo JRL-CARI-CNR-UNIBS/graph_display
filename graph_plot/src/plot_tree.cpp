@@ -38,14 +38,14 @@ int main(int argc, char **argv)
   robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
   robot_model::RobotModelPtr       kinematic_model = robot_model_loader.getModel();
   planning_scene::PlanningScenePtr planning_scene = std::make_shared<planning_scene::PlanningScene>(kinematic_model);
-  graph_core::CollisionCheckerPtr checker = std::make_shared<graph_core::Cube3dCollisionChecker>(logger);
+  graph::core::CollisionCheckerPtr checker = std::make_shared<graph::core::Cube3dCollisionChecker>(logger);
 
-  graph_core::MetricsPtr metrics=std::make_shared<graph_core::Metrics>(logger);
+  graph::core::MetricsPtr metrics=std::make_shared<graph::core::Metrics>(logger);
 
   std::string what;
 
 
-  graph_display::Display display_path(planning_scene,group_name);
+  graph::display::Display display_path(planning_scene,group_name);
   display_path.clearMarkers();
 
   YAML::Node config;
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
         return 0;
       }
 
-      graph_core::TreePtr tree=graph_core::Tree::fromYAML(p,maximum_distance,checker,metrics,logger,true);
+      graph::core::TreePtr tree=graph::core::Tree::fromYAML(p,maximum_distance,checker,metrics,logger,true);
       if (tree)
       {
         display_path.clearMarkers();

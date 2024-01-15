@@ -45,14 +45,14 @@ void loop_animation()
   robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
   robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
   planning_scene::PlanningScenePtr planning_scene = std::make_shared<planning_scene::PlanningScene>(kinematic_model);
-  graph_core::CollisionCheckerPtr checker =
-      std::make_shared<graph_core::Cube3dCollisionChecker>(logger);
+  graph::core::CollisionCheckerPtr checker =
+      std::make_shared<graph::core::Cube3dCollisionChecker>(logger);
 
-  graph_core::MetricsPtr metrics = std::make_shared<graph_core::Metrics>(logger);
+  graph::core::MetricsPtr metrics = std::make_shared<graph::core::Metrics>(logger);
 
   std::string what;
 
-  graph_display::Display display_path(planning_scene, group_name);
+  graph::display::Display display_path(planning_scene, group_name);
   display_path.clearMarkers();
 
   std::vector<std::string> path_names;
@@ -62,7 +62,7 @@ void loop_animation()
     return;
   }
 
-  std::vector<graph_core::PathPtr> paths;
+  std::vector<graph::core::PathPtr> paths;
   std::vector<int> path_ids;
   std::vector<std::vector<double>> path_colors;
 
@@ -91,17 +91,17 @@ void loop_animation()
     assert(color.size() == 4);
     path_colors.push_back(color);
 
-    graph_core::NodePtr n1 = std::make_shared<graph_core::Node>(waypoints.at(0));
-    std::vector<graph_core::ConnectionPtr> conns;
+    graph::core::NodePtr n1 = std::make_shared<graph::core::Node>(waypoints.at(0));
+    std::vector<graph::core::ConnectionPtr> conns;
     for (size_t idx = 1; idx < waypoints.size(); idx++)
     {
-      graph_core::NodePtr n2 = std::make_shared<graph_core::Node>(waypoints.at(idx));
-      graph_core::ConnectionPtr conn = std::make_shared<graph_core::Connection>(n1, n2, logger);
+      graph::core::NodePtr n2 = std::make_shared<graph::core::Node>(waypoints.at(idx));
+      graph::core::ConnectionPtr conn = std::make_shared<graph::core::Connection>(n1, n2, logger);
       conns.push_back(conn);
       n1 = n2;
     }
 
-    graph_core::PathPtr path = std::make_shared<graph_core::Path>(conns, metrics, checker, logger);
+    graph::core::PathPtr path = std::make_shared<graph::core::Path>(conns, metrics, checker, logger);
     paths.push_back(path);
     path_ids.push_back(display_path.displayPath(path, paths.size()));
   }
