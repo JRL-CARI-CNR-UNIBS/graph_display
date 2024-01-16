@@ -1,16 +1,15 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(graph_plot)
-add_compile_options(-std=c++17)
+add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   graph_core
   roscpp
   rosparam_utilities
-  graph_display
 )
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES graph_plot
- CATKIN_DEPENDS graph_core roscpp rosparam_utilities graph_display
+ CATKIN_DEPENDS graph_core roscpp rosparam_utilities
  DEPENDS
 )
 
