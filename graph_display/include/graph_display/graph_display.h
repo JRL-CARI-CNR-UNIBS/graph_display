@@ -26,14 +26,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
+#include "rclcpp/rclcpp.hpp"
 #include <graph_core/graph/net.h>
 #include <graph_core/graph/subtree.h>
 #include <graph_core/graph/path.h>
-#include <visualization_msgs/MarkerArray.h>
+#include <visualization_msgs/msg/marker_array.h>
 #include <moveit/planning_scene/planning_scene.h>
-#include <eigen_conversions/eigen_msg.h>
+#include <tf2_eigen/tf2_eigen.hpp>
 #include <moveit_visual_tools/moveit_visual_tools.h>
-#include <moveit_msgs/DisplayTrajectory.h>
+#include <moveit_msgs/msg/display_trajectory.h>
 
 namespace graph
 {
@@ -61,8 +62,8 @@ protected:
   std::vector<double> node_marker_scale_;
   std::vector<double> connection_marker_scale_;
   std::vector<double> tree_marker_scale_;
-  ros::Publisher marker_pub_;
-  ros::NodeHandle nh_;
+  rclcpp::Publisher<visualization_msgs::msg::Marker> marker_pub_;
+  // ros::NodeHandle nh_;
   moveit::core::RobotStatePtr state_;
 
   const moveit::core::JointModelGroup* jmg_;
@@ -71,11 +72,11 @@ protected:
 
   void displayTreeNode(const NodePtr& n,
                        const TreePtr& tree,
-                       std::vector<geometry_msgs::Point> &points,
+                       std::vector<geometry_msgs::msg::Point> &points,
                        const bool check_in_tree = false);
   void displayNetNode(const NodePtr& n,
                       const NetPtr& net,
-                      std::vector<geometry_msgs::Point> &points);
+                      std::vector<geometry_msgs::msg::Point> &points);
 public:
   Display(const planning_scene::PlanningSceneConstPtr planning_scene,
           const std::string& group_name,

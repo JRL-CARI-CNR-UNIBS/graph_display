@@ -52,15 +52,15 @@ Display::Display(const planning_scene::PlanningSceneConstPtr planning_scene,
   jmg_ = state_->getJointModelGroup(group_name_);
   joint_names_=jmg_->getActiveJointModelNames();
   joint_models_=jmg_->getActiveJointModels();
-  marker_pub_ = nh_.advertise<visualization_msgs::Marker>("/marker_visualization_topic", 1000,true);
+  marker_pub_ = nh_.advertise<visualization_msgs::msg::Marker>("/marker_visualization_topic", 1000,true);
   for (int idx=0;idx<4;idx++)
     clearMarkers();
 }
 
 void Display::clearMarkers(const std::string& ns)
 {
-  visualization_msgs::Marker marker;
-  marker.action = visualization_msgs::Marker::DELETEALL;
+  visualization_msgs::msg::Marker marker;
+  marker.action = visualization_msgs::msg::Marker::DELETEALL;
 
   marker.header.stamp=ros::Time::now();
   marker.header.frame_id = planning_scene_->getRobotModel()->getRootLink()->getName();
@@ -73,8 +73,8 @@ void Display::clearMarkers(const std::string& ns)
 }
 void Display::clearMarker(const int& id,const std::string& ns)
 {
-  visualization_msgs::Marker marker;
-  marker.action = visualization_msgs::Marker::DELETE;
+  visualization_msgs::msg::Marker marker;
+  marker.action = visualization_msgs::msg::Marker::DELETE;
 
   marker.header.stamp=ros::Time::now();
   marker.header.frame_id = planning_scene_->getRobotModel()->getRootLink()->getName();
@@ -102,8 +102,8 @@ int Display::displayNode(const NodePtr &n,
                          const bool &plot_state)
 {
 
-  visualization_msgs::Marker marker;
-  marker.type = visualization_msgs::Marker::SPHERE;
+  visualization_msgs::msg::Marker marker;
+  marker.type = visualization_msgs::msg::Marker::SPHERE;
 
   marker.ns = ns;
 
@@ -113,7 +113,7 @@ int Display::displayNode(const NodePtr &n,
 
   marker.header.frame_id=planning_scene_->getRobotModel()->getRootLink()->getName();
   marker.header.stamp=ros::Time::now();
-  marker.action = visualization_msgs::Marker::ADD;
+  marker.action = visualization_msgs::msg::Marker::ADD;
   marker.id= static_id;
 
   marker.scale.x = node_marker_scale_.at(0);
@@ -156,12 +156,12 @@ int Display::displayConnection(const ConnectionPtr& conn,
                                const std::vector<double>& marker_color,
                                const bool& plot_state)
 {
-  visualization_msgs::Marker marker;
+  visualization_msgs::msg::Marker marker;
   marker.ns = ns;
-  marker.type = visualization_msgs::Marker::LINE_LIST;
+  marker.type = visualization_msgs::msg::Marker::LINE_LIST;
   marker.header.frame_id="world";
   marker.header.stamp=ros::Time::now();
-  marker.action = visualization_msgs::Marker::ADD;
+  marker.action = visualization_msgs::msg::Marker::ADD;
   marker.id= static_id;
 
   marker.scale.x = connection_marker_scale_.at(0);
@@ -245,12 +245,12 @@ int Display::displayPath(const PathPtr &path,
                          const std::vector<double> &marker_color,
                          const bool &plot_state)
 {
-  visualization_msgs::Marker marker;
+  visualization_msgs::msg::Marker marker;
   marker.ns = ns;
-  marker.type = visualization_msgs::Marker::LINE_LIST;
+  marker.type = visualization_msgs::msg::Marker::LINE_LIST;
   marker.header.frame_id="world";
   marker.header.stamp=ros::Time::now();
-  marker.action = visualization_msgs::Marker::ADD;
+  marker.action = visualization_msgs::msg::Marker::ADD;
   marker.id= static_id;
 
   marker.scale.x = connection_marker_scale_.at(0);
@@ -341,12 +341,12 @@ std::vector<int> Display::displayPathAndWaypoints(const PathPtr &path,
                                                   const std::vector<double> &marker_color,
                                                   const bool &plot_state)
 {
-  visualization_msgs::Marker marker;
+  visualization_msgs::msg::Marker marker;
   marker.ns = ns;
-  marker.type = visualization_msgs::Marker::LINE_LIST;
+  marker.type = visualization_msgs::msg::Marker::LINE_LIST;
   marker.header.frame_id="world";
   marker.header.stamp=ros::Time::now();
-  marker.action = visualization_msgs::Marker::ADD;
+  marker.action = visualization_msgs::msg::Marker::ADD;
   marker.id= static_id_path;
 
   marker.scale.x = connection_marker_scale_.at(0);
@@ -369,12 +369,12 @@ std::vector<int> Display::displayPathAndWaypoints(const PathPtr &path,
   pose.orientation.w = 1;
   marker.pose = pose;
 
-  visualization_msgs::Marker marker_wp;
+  visualization_msgs::msg::Marker marker_wp;
   marker_wp.ns = ns;
-  marker_wp.type = visualization_msgs::Marker::SPHERE_LIST;
+  marker_wp.type = visualization_msgs::msg::Marker::SPHERE_LIST;
   marker_wp.header.frame_id="world";
   marker_wp.header.stamp=ros::Time::now();
-  marker_wp.action = visualization_msgs::Marker::ADD;
+  marker_wp.action = visualization_msgs::msg::Marker::ADD;
   marker_wp.id= static_id_wp;
 
   marker_wp.scale.x = node_marker_scale_.at(0);
@@ -469,12 +469,12 @@ int Display::displaySubtree(const SubtreePtr &subtree,
                             const std::string &ns,
                             const std::vector<double> &marker_color)
 {
-  visualization_msgs::Marker marker;
+  visualization_msgs::msg::Marker marker;
   marker.ns = ns;
-  marker.type = visualization_msgs::Marker::LINE_LIST;
+  marker.type = visualization_msgs::msg::Marker::LINE_LIST;
   marker.header.frame_id="world";
   marker.header.stamp=ros::Time::now();
-  marker.action = visualization_msgs::Marker::ADD;
+  marker.action = visualization_msgs::msg::Marker::ADD;
   marker.id= static_id;
 
   marker.scale.x = tree_marker_scale_.at(0);
@@ -517,12 +517,12 @@ int Display::displayTree(const TreePtr &tree,
                          const std::string &ns,
                          const std::vector<double> &marker_color)
 {
-  visualization_msgs::Marker marker;
+  visualization_msgs::msg::Marker marker;
   marker.ns = ns;
-  marker.type = visualization_msgs::Marker::LINE_LIST;
+  marker.type = visualization_msgs::msg::Marker::LINE_LIST;
   marker.header.frame_id="world";
   marker.header.stamp=ros::Time::now();
-  marker.action = visualization_msgs::Marker::ADD;
+  marker.action = visualization_msgs::msg::Marker::ADD;
   marker.id= static_id;
 
   marker.scale.x = tree_marker_scale_.at(0);
@@ -608,12 +608,12 @@ int Display::displayNet(const NetPtr &net,
                         const std::string &ns,
                         const std::vector<double> &marker_color)
 {
-  visualization_msgs::Marker marker;
+  visualization_msgs::msg::Marker marker;
   marker.ns = ns;
-  marker.type = visualization_msgs::Marker::LINE_LIST;
+  marker.type = visualization_msgs::msg::Marker::LINE_LIST;
   marker.header.frame_id="world";
   marker.header.stamp=ros::Time::now();
-  marker.action = visualization_msgs::Marker::ADD;
+  marker.action = visualization_msgs::msg::Marker::ADD;
   marker.id= static_id;
 
   marker.scale.x = tree_marker_scale_.at(0);
