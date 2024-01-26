@@ -62,8 +62,8 @@ protected:
   std::vector<double> node_marker_scale_;
   std::vector<double> connection_marker_scale_;
   std::vector<double> tree_marker_scale_;
-  rclcpp::Publisher<visualization_msgs::msg::Marker> marker_pub_;
-  // ros::NodeHandle nh_;
+  std::shared_ptr<rclcpp::Publisher<visualization_msgs::msg::Marker>> marker_pub_;
+  std::shared_ptr<rclcpp::Node> nh_;
   moveit::core::RobotStatePtr state_;
 
   const moveit::core::JointModelGroup* jmg_;
@@ -114,41 +114,33 @@ public:
   void clearMarker(const int& id,const std::string& ns="graph_display");
   int displayNode(const NodePtr& n,
                   const std::string& ns="graph_display",
-                  const std::vector<double>& marker_color = {1,0,0,1.0},
-                  const bool& plot_state=false);
+                  const std::vector<double>& marker_color = {1,0,0,1.0});
   int displayNode(const NodePtr& n,
                   const int &static_id,
                   const std::string& ns="graph_display",
-                  const std::vector<double>& marker_color = {1,0,0,1.0},
-                  const bool& plot_state=false);
+                  const std::vector<double>& marker_color = {1,0,0,1.0});
   int displayConnection(const ConnectionPtr& conn,
                         const std::string& ns="graph_display",
-                        const std::vector<double>& marker_color= {1,0,0,1.0},
-                        const bool& plot_state=false);
+                        const std::vector<double>& marker_color= {1,0,0,1.0});
   int displayConnection(const ConnectionPtr& conn,
                         const int &static_id,
                         const std::string& ns="graph_display",
-                        const std::vector<double>& marker_color= {1,0,0,1.0},
-                        const bool& plot_state=false);
+                        const std::vector<double>& marker_color= {1,0,0,1.0});
   int displayPath(const PathPtr& path,
                   const std::string& ns="graph_display",
-                  const std::vector<double>& marker_color= {1,0,0,1.0},
-                  const bool& plot_state=false);
+                  const std::vector<double>& marker_color= {1,0,0,1.0});
   int displayPath(const PathPtr& path,
                   const int &static_id,
                   const std::string& ns="graph_display",
-                  const std::vector<double>& marker_color= {1,0,0,1.0},
-                  const bool& plot_state=false);
+                  const std::vector<double>& marker_color= {1,0,0,1.0});
   std::vector<int> displayPathAndWaypoints(const PathPtr& path,
                                            const std::string& ns="graph_display",
-                                           const std::vector<double>& marker_color= {1,0,0,1.0},
-                                           const bool& plot_state=false);
+                                           const std::vector<double>& marker_color= {1,0,0,1.0});
   std::vector<int> displayPathAndWaypoints(const PathPtr& path,
                                            const int &static_id_path,
                                            const int &static_id_wp,
                                            const std::string& ns="graph_display",
-                                           const std::vector<double>& marker_color= {1,0,0,1.0},
-                                           const bool& plot_state=false);
+                                           const std::vector<double>& marker_color= {1,0,0,1.0});
   int displayTree(const TreePtr& tree,
                   const std::string& ns="graph_display",
                   const std::vector<double>& marker_color= {1,0,0,1.0});

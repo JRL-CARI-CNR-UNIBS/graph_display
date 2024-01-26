@@ -42,8 +42,6 @@ Display::Display(const planning_scene::PlanningSceneConstPtr planning_scene,
   if (last_link.empty())
     last_link_=planning_scene->getRobotModel()->getJointModelGroup(group_name)->getLinkModelNames().back();
 
-
-
   node_marker_scale_.resize(3,DEFAULT_NODE_SIZE);
   connection_marker_scale_.resize(3,DEFAULT_CONNECTION_SIZE);
   tree_marker_scale_.resize(3,DEFAULT_TREE_SIZE);
@@ -52,7 +50,7 @@ Display::Display(const planning_scene::PlanningSceneConstPtr planning_scene,
   jmg_ = state_->getJointModelGroup(group_name_);
   joint_names_=jmg_->getActiveJointModelNames();
   joint_models_=jmg_->getActiveJointModels();
-  marker_pub_ = nh_.advertise<visualization_msgs::msg::Marker>("/marker_visualization_topic", 1000,true);
+  marker_pub_ = nh_->create_publisher<visualization_msgs::msg::Marker>("/marker_visualization_topic", 1000);
   for (int idx=0;idx<4;idx++)
     clearMarkers();
 }
@@ -62,44 +60,42 @@ void Display::clearMarkers(const std::string& ns)
   visualization_msgs::msg::Marker marker;
   marker.action = visualization_msgs::msg::Marker::DELETEALL;
 
-  marker.header.stamp=ros::Time::now();
+  marker.header.stamp=nh_->now();
   marker.header.frame_id = planning_scene_->getRobotModel()->getRootLink()->getName();
 
   marker.ns = ns;
   marker.id= marker_id_++;
 
   marker_id_ = 0;
-  marker_pub_.publish(marker);
+  marker_pub_->publish(marker);
 }
 void Display::clearMarker(const int& id,const std::string& ns)
 {
   visualization_msgs::msg::Marker marker;
   marker.action = visualization_msgs::msg::Marker::DELETE;
 
-  marker.header.stamp=ros::Time::now();
+  marker.header.stamp=nh_->now();
   marker.header.frame_id = planning_scene_->getRobotModel()->getRootLink()->getName();
 
   marker.ns = ns;
   marker.id= id;
 
-  marker_pub_.publish(marker);
+  marker_pub_->publish(marker);
 }
 
 int Display::displayNode(const NodePtr &n,
                          const std::string& ns,
-                         const std::vector<double> &marker_color,
-                         const bool &plot_state)
+                         const std::vector<double> &marker_color)
 {
   int static_id = marker_id_++;
 
-  return displayNode(n,static_id,ns,marker_color,plot_state);
+  return displayNode(n,static_id,ns,marker_color);
 }
 
 int Display::displayNode(const NodePtr &n,
                          const int &static_id,
                          const std::string& ns,
-                         const std::vector<double> &marker_color,
-                         const bool &plot_state)
+                         const std::vector<double> &marker_color)
 {
 
   visualization_msgs::msg::Marker marker;
@@ -109,10 +105,11 @@ int Display::displayNode(const NodePtr &n,
 
   for (size_t ij=0;ij<joint_names_.size();ij++)
     state_->setJointPositions(joint_models_.at(ij),&n->getConfiguration()(ij));
-  tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),marker.pose);
+
+  marker.pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
 
   marker.header.frame_id=planning_scene_->getRobotModel()->getRootLink()->getName();
-  marker.header.stamp=ros::Time::now();
+  marker.header.stamp=nh_->now();
   marker.action = visualization_msgs::msg::Marker::ADD;
   marker.id= static_id;
 
@@ -125,7 +122,7 @@ int Display::displayNode(const NodePtr &n,
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
 
-  geometry_msgs::Pose pose;
+  geometry_msgs::msg::Pose pose;
   pose.position.x = 0;
   pose.position.y = 0;
   pose.position.z = 0;
@@ -136,31 +133,29 @@ int Display::displayNode(const NodePtr &n,
   pose.orientation.w = 1;
   marker.pose = pose;
 
-  marker_pub_.publish(marker);
+  marker_pub_->publish(marker);
   return marker.id;
 }
 
 int Display::displayConnection(const ConnectionPtr& conn,
                                const std::string& ns,
-                               const std::vector<double>& marker_color,
-                               const bool& plot_state)
+                               const std::vector<double>& marker_color)
 {
   int static_id = marker_id_++;
 
-  return displayConnection(conn,static_id,ns,marker_color,plot_state);
+  return displayConnection(conn,static_id,ns,marker_color);
 }
 
 int Display::displayConnection(const ConnectionPtr& conn,
                                const int &static_id,
                                const std::string& ns,
-                               const std::vector<double>& marker_color,
-                               const bool& plot_state)
+                               const std::vector<double>& marker_color)
 {
   visualization_msgs::msg::Marker marker;
   marker.ns = ns;
   marker.type = visualization_msgs::msg::Marker::LINE_LIST;
   marker.header.frame_id="world";
-  marker.header.stamp=ros::Time::now();
+  marker.header.stamp=nh_->now();
   marker.action = visualization_msgs::msg::Marker::ADD;
   marker.id= static_id;
 
@@ -173,7 +168,7 @@ int Display::displayConnection(const ConnectionPtr& conn,
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
 
-  geometry_msgs::Pose pose;
+  geometry_msgs::msg::Pose pose;
   pose.position.x = 0;
   pose.position.y = 0;
   pose.position.z = 0;
@@ -197,17 +192,19 @@ int Display::displayConnection(const ConnectionPtr& conn,
   {
     conf2 = parent + i*MAX_LENGTH*v;
 
-    geometry_msgs::Pose pose;
+    geometry_msgs::msg::Pose pose;
     //state_->setJointGroupPositions(group_name_,conf1);
     for (size_t ij=0;ij<joint_names_.size();ij++)
       state_->setJointPositions(joint_models_.at(ij),&conf1(ij));
-    tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+
+    pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
     marker.points.push_back(pose.position);
 
     //state_->setJointGroupPositions(group_name_,conf2);
     for (size_t ij=0;ij<joint_names_.size();ij++)
       state_->setJointPositions(joint_models_.at(ij),&conf2(ij));
-    tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+
+    pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
     marker.points.push_back(pose.position);
 
     conf1 = conf2;
@@ -215,41 +212,39 @@ int Display::displayConnection(const ConnectionPtr& conn,
 
   if(conf1 != child)
   {
-    geometry_msgs::Pose pose;
+    geometry_msgs::msg::Pose pose;
     state_->setJointGroupPositions(group_name_,conf1);
-    tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+    pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
     marker.points.push_back(pose.position);
 
     state_->setJointGroupPositions(group_name_,child);
-    tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+    pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
     marker.points.push_back(pose.position);
   }
 
-  marker_pub_.publish(marker);
+  marker_pub_->publish(marker);
   return marker.id;
 }
 
 int Display::displayPath(const PathPtr &path,
                          const std::string& ns,
-                         const std::vector<double> &marker_color,
-                         const bool &plot_state)
+                         const std::vector<double> &marker_color)
 {
   int static_id = marker_id_++;
 
-  return displayPath(path,static_id,ns,marker_color,plot_state);
+  return displayPath(path,static_id,ns,marker_color);
 }
 
 int Display::displayPath(const PathPtr &path,
                          const int &static_id,
                          const std::string& ns,
-                         const std::vector<double> &marker_color,
-                         const bool &plot_state)
+                         const std::vector<double> &marker_color)
 {
   visualization_msgs::msg::Marker marker;
   marker.ns = ns;
   marker.type = visualization_msgs::msg::Marker::LINE_LIST;
   marker.header.frame_id="world";
-  marker.header.stamp=ros::Time::now();
+  marker.header.stamp=nh_->now();
   marker.action = visualization_msgs::msg::Marker::ADD;
   marker.id= static_id;
 
@@ -262,7 +257,7 @@ int Display::displayPath(const PathPtr &path,
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
 
-  geometry_msgs::Pose pose;
+  geometry_msgs::msg::Pose pose;
   pose.position.x = 0;
   pose.position.y = 0;
   pose.position.z = 0;
@@ -291,18 +286,19 @@ int Display::displayPath(const PathPtr &path,
     {
       conf2 = parent + i*MAX_LENGTH*v;
 
-      geometry_msgs::Pose pose;
+      geometry_msgs::msg::Pose pose;
       //state_->setJointGroupPositions(group_name_,conf1);
       for (size_t ij=0;ij<joint_names_.size();ij++)
         state_->setJointPositions(joint_models_.at(ij),&conf1(ij));
 
-      tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+      pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
       marker.points.push_back(pose.position);
 
       //state_->setJointGroupPositions(group_name_,conf2);
       for (size_t ij=0;ij<joint_names_.size();ij++)
         state_->setJointPositions(joint_models_.at(ij),&conf2(ij));
-      tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+
+      pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
       marker.points.push_back(pose.position);
 
       conf1 = conf2;
@@ -311,41 +307,39 @@ int Display::displayPath(const PathPtr &path,
     if(conf1 != child)
     {
       state_->setJointGroupPositions(group_name_,conf1);
-      tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+      pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
       marker.points.push_back(pose.position);
 
       state_->setJointGroupPositions(group_name_,child);
-      tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+      pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
       marker.points.push_back(pose.position);
     }
   }
 
-  marker_pub_.publish(marker);
+  marker_pub_->publish(marker);
   return marker.id;
 }
 
 std::vector<int> Display::displayPathAndWaypoints(const PathPtr &path,
                                                   const std::string& ns,
-                                                  const std::vector<double> &marker_color,
-                                                  const bool &plot_state)
+                                                  const std::vector<double> &marker_color)
 {
   int static_id_path = marker_id_++;
   int static_id_wp = marker_id_++;
 
-  return displayPathAndWaypoints(path,static_id_path,static_id_wp,ns,marker_color,plot_state);
+  return displayPathAndWaypoints(path,static_id_path,static_id_wp,ns,marker_color);
 }
 std::vector<int> Display::displayPathAndWaypoints(const PathPtr &path,
                                                   const int &static_id_path,
                                                   const int &static_id_wp,
                                                   const std::string& ns,
-                                                  const std::vector<double> &marker_color,
-                                                  const bool &plot_state)
+                                                  const std::vector<double> &marker_color)
 {
   visualization_msgs::msg::Marker marker;
   marker.ns = ns;
   marker.type = visualization_msgs::msg::Marker::LINE_LIST;
   marker.header.frame_id="world";
-  marker.header.stamp=ros::Time::now();
+  marker.header.stamp=nh_->now();
   marker.action = visualization_msgs::msg::Marker::ADD;
   marker.id= static_id_path;
 
@@ -358,7 +352,7 @@ std::vector<int> Display::displayPathAndWaypoints(const PathPtr &path,
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
 
-  geometry_msgs::Pose pose;
+  geometry_msgs::msg::Pose pose;
   pose.position.x = 0;
   pose.position.y = 0;
   pose.position.z = 0;
@@ -373,7 +367,7 @@ std::vector<int> Display::displayPathAndWaypoints(const PathPtr &path,
   marker_wp.ns = ns;
   marker_wp.type = visualization_msgs::msg::Marker::SPHERE_LIST;
   marker_wp.header.frame_id="world";
-  marker_wp.header.stamp=ros::Time::now();
+  marker_wp.header.stamp=nh_->now();
   marker_wp.action = visualization_msgs::msg::Marker::ADD;
   marker_wp.id= static_id_wp;
 
@@ -401,13 +395,13 @@ std::vector<int> Display::displayPathAndWaypoints(const PathPtr &path,
     Eigen::VectorXd child = conn->getChild()->getConfiguration();
 
     //Waypoints
-    geometry_msgs::Pose pose;
+    geometry_msgs::msg::Pose pose;
     state_->setJointGroupPositions(group_name_,parent);
-    tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+    pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
     marker_wp.points.push_back(pose.position);
 
     state_->setJointGroupPositions(group_name_,child);
-    tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+    pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
     marker_wp.points.push_back(pose.position);
 
     //Connections
@@ -421,18 +415,19 @@ std::vector<int> Display::displayPathAndWaypoints(const PathPtr &path,
     {
       conf2 = parent + i*MAX_LENGTH*v;
 
-      geometry_msgs::Pose pose;
+      geometry_msgs::msg::Pose pose;
       //state_->setJointGroupPositions(group_name_,conf1);
       for (size_t ij=0;ij<joint_names_.size();ij++)
         state_->setJointPositions(joint_models_.at(ij),&conf1(ij));
 
-      tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+      pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
       marker.points.push_back(pose.position);
 
       //state_->setJointGroupPositions(group_name_,conf2);
       for (size_t ij=0;ij<joint_names_.size();ij++)
         state_->setJointPositions(joint_models_.at(ij),&conf2(ij));
-      tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+
+      pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
       marker.points.push_back(pose.position);
 
       conf1 = conf2;
@@ -441,17 +436,17 @@ std::vector<int> Display::displayPathAndWaypoints(const PathPtr &path,
     if(conf1 != child)
     {
       state_->setJointGroupPositions(group_name_,conf1);
-      tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+      pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
       marker.points.push_back(pose.position);
 
       state_->setJointGroupPositions(group_name_,child);
-      tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+      pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
       marker.points.push_back(pose.position);
     }
   }
 
-  marker_pub_.publish(marker);
-  marker_pub_.publish(marker_wp);
+  marker_pub_->publish(marker);
+  marker_pub_->publish(marker_wp);
 
   return ids;
 }
@@ -473,7 +468,7 @@ int Display::displaySubtree(const SubtreePtr &subtree,
   marker.ns = ns;
   marker.type = visualization_msgs::msg::Marker::LINE_LIST;
   marker.header.frame_id="world";
-  marker.header.stamp=ros::Time::now();
+  marker.header.stamp=nh_->now();
   marker.action = visualization_msgs::msg::Marker::ADD;
   marker.id= static_id;
 
@@ -486,7 +481,7 @@ int Display::displaySubtree(const SubtreePtr &subtree,
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
 
-  geometry_msgs::Pose pose;
+  geometry_msgs::msg::Pose pose;
   pose.position.x = 0;
   pose.position.y = 0;
   pose.position.z = 0;
@@ -499,7 +494,7 @@ int Display::displaySubtree(const SubtreePtr &subtree,
 
   displayTreeNode(subtree->getRoot(),subtree,marker.points,true);
 
-  marker_pub_.publish(marker);
+  marker_pub_->publish(marker);
   return marker.id;
 }
 
@@ -521,7 +516,7 @@ int Display::displayTree(const TreePtr &tree,
   marker.ns = ns;
   marker.type = visualization_msgs::msg::Marker::LINE_LIST;
   marker.header.frame_id="world";
-  marker.header.stamp=ros::Time::now();
+  marker.header.stamp=nh_->now();
   marker.action = visualization_msgs::msg::Marker::ADD;
   marker.id= static_id;
 
@@ -534,7 +529,7 @@ int Display::displayTree(const TreePtr &tree,
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
 
-  geometry_msgs::Pose pose;
+  geometry_msgs::msg::Pose pose;
   pose.position.x = 0;
   pose.position.y = 0;
   pose.position.z = 0;
@@ -547,14 +542,14 @@ int Display::displayTree(const TreePtr &tree,
 
   displayTreeNode(tree->getRoot(),tree,marker.points,false);
 
-  marker_pub_.publish(marker);
+  marker_pub_->publish(marker);
   return marker.id;
 
 }
 
 void Display::displayTreeNode(const NodePtr &n,
                               const TreePtr& tree,
-                              std::vector<geometry_msgs::Point>& points,
+                              std::vector<geometry_msgs::msg::Point>& points,
                               const bool check_in_tree)
 {
   std::vector<ConnectionPtr> connections = n->getChildConnections();
@@ -576,17 +571,19 @@ void Display::displayTreeNode(const NodePtr &n,
 
     if(add_points)
     {
-      geometry_msgs::Pose pose;
+      geometry_msgs::msg::Pose pose;
       //state_->setJointGroupPositions(group_name_,conn->getParent()->getConfiguration());
       for (size_t ij=0;ij<joint_names_.size();ij++)
         state_->setJointPositions(joint_models_.at(ij),&conn->getParent()->getConfiguration()(ij));
-      tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+      
+      pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
       points.push_back(pose.position);
 
 //      state_->setJointGroupPositions(group_name_,conn->getChild()->getConfiguration());
       for (size_t ij=0;ij<joint_names_.size();ij++)
         state_->setJointPositions(joint_models_.at(ij),&conn->getChild()->getConfiguration()(ij));
-      tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+
+      pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
       points.push_back(pose.position);
 
       displayTreeNode(conn->getChild(),tree,points,check_in_tree);
@@ -612,7 +609,7 @@ int Display::displayNet(const NetPtr &net,
   marker.ns = ns;
   marker.type = visualization_msgs::msg::Marker::LINE_LIST;
   marker.header.frame_id="world";
-  marker.header.stamp=ros::Time::now();
+  marker.header.stamp=nh_->now();
   marker.action = visualization_msgs::msg::Marker::ADD;
   marker.id= static_id;
 
@@ -625,7 +622,7 @@ int Display::displayNet(const NetPtr &net,
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
 
-  geometry_msgs::Pose pose;
+  geometry_msgs::msg::Pose pose;
   pose.position.x = 0;
   pose.position.y = 0;
   pose.position.z = 0;
@@ -638,14 +635,14 @@ int Display::displayNet(const NetPtr &net,
 
   displayNetNode(net->getTree()->getRoot(),net,marker.points);
 
-  marker_pub_.publish(marker);
+  marker_pub_->publish(marker);
   return marker.id;
 
 }
 
 void Display::displayNetNode(const NodePtr &n,
                              const NetPtr& net,
-                             std::vector<geometry_msgs::Point>& points)
+                             std::vector<geometry_msgs::msg::Point>& points)
 {
   std::vector<ConnectionPtr> connections=n->getChildConnections();
   std::vector<ConnectionPtr> net_connections=n->getNetChildConnections();
@@ -654,19 +651,20 @@ void Display::displayNetNode(const NodePtr &n,
   if(connections.empty())
     return;
 
-  geometry_msgs::Pose pose;
+  geometry_msgs::msg::Pose pose;
   for(const ConnectionPtr& conn: connections)
   {
-    geometry_msgs::Pose pose;
+    geometry_msgs::msg::Pose pose;
     for (size_t ij=0;ij<joint_names_.size();ij++)
       state_->setJointPositions(joint_models_.at(ij),&conn->getParent()->getConfiguration()(ij));
 
-    tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+    pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
     points.push_back(pose.position);
 
     for (size_t ij=0;ij<joint_names_.size();ij++)
       state_->setJointPositions(joint_models_.at(ij),&conn->getChild()->getConfiguration()(ij));
-    tf::poseEigenToMsg(state_->getGlobalLinkTransform(last_link_),pose);
+    
+    pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
     points.push_back(pose.position);
 
     displayNetNode(conn->getChild(),net,points);
@@ -675,7 +673,7 @@ void Display::displayNetNode(const NodePtr &n,
 
 void Display::nextButton(const std::string& string)
 {
-  moveit_visual_tools::MoveItVisualToolsPtr visual_tools = std::make_shared<moveit_visual_tools::MoveItVisualTools>("/rviz_visual_tools");
+  moveit_visual_tools::MoveItVisualToolsPtr visual_tools = std::make_shared<moveit_visual_tools::MoveItVisualTools>(nh_, "world", "/rviz_visual_tools");
   visual_tools->loadRemoteControl();
   visual_tools->prompt(string);
 }
