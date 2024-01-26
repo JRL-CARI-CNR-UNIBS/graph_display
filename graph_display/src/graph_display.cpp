@@ -87,19 +87,17 @@ void Display::clearMarker(const int& id,const std::string& ns)
 
 int Display::displayNode(const NodePtr &n,
                          const std::string& ns,
-                         const std::vector<double> &marker_color,
-                         const bool &plot_state)
+                         const std::vector<double> &marker_color)
 {
   int static_id = marker_id_++;
 
-  return displayNode(n,static_id,ns,marker_color,plot_state);
+  return displayNode(n,static_id,ns,marker_color);
 }
 
 int Display::displayNode(const NodePtr &n,
                          const int &static_id,
                          const std::string& ns,
-                         const std::vector<double> &marker_color,
-                         const bool &plot_state)
+                         const std::vector<double> &marker_color)
 {
 
   visualization_msgs::Marker marker;
@@ -142,19 +140,17 @@ int Display::displayNode(const NodePtr &n,
 
 int Display::displayConnection(const ConnectionPtr& conn,
                                const std::string& ns,
-                               const std::vector<double>& marker_color,
-                               const bool& plot_state)
+                               const std::vector<double>& marker_color)
 {
   int static_id = marker_id_++;
 
-  return displayConnection(conn,static_id,ns,marker_color,plot_state);
+  return displayConnection(conn,static_id,ns,marker_color);
 }
 
 int Display::displayConnection(const ConnectionPtr& conn,
                                const int &static_id,
                                const std::string& ns,
-                               const std::vector<double>& marker_color,
-                               const bool& plot_state)
+                               const std::vector<double>& marker_color)
 {
   visualization_msgs::Marker marker;
   marker.ns = ns;
@@ -231,19 +227,17 @@ int Display::displayConnection(const ConnectionPtr& conn,
 
 int Display::displayPath(const PathPtr &path,
                          const std::string& ns,
-                         const std::vector<double> &marker_color,
-                         const bool &plot_state)
+                         const std::vector<double> &marker_color)
 {
   int static_id = marker_id_++;
 
-  return displayPath(path,static_id,ns,marker_color,plot_state);
+  return displayPath(path,static_id,ns,marker_color);
 }
 
 int Display::displayPath(const PathPtr &path,
                          const int &static_id,
                          const std::string& ns,
-                         const std::vector<double> &marker_color,
-                         const bool &plot_state)
+                         const std::vector<double> &marker_color)
 {
   visualization_msgs::Marker marker;
   marker.ns = ns;
@@ -326,20 +320,18 @@ int Display::displayPath(const PathPtr &path,
 
 std::vector<int> Display::displayPathAndWaypoints(const PathPtr &path,
                                                   const std::string& ns,
-                                                  const std::vector<double> &marker_color,
-                                                  const bool &plot_state)
+                                                  const std::vector<double> &marker_color)
 {
   int static_id_path = marker_id_++;
   int static_id_wp = marker_id_++;
 
-  return displayPathAndWaypoints(path,static_id_path,static_id_wp,ns,marker_color,plot_state);
+  return displayPathAndWaypoints(path,static_id_path,static_id_wp,ns,marker_color);
 }
 std::vector<int> Display::displayPathAndWaypoints(const PathPtr &path,
                                                   const int &static_id_path,
                                                   const int &static_id_wp,
                                                   const std::string& ns,
-                                                  const std::vector<double> &marker_color,
-                                                  const bool &plot_state)
+                                                  const std::vector<double> &marker_color)
 {
   visualization_msgs::Marker marker;
   marker.ns = ns;

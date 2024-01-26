@@ -113,31 +113,25 @@ public:
   void clearMarker(const int& id,const std::string& ns="graph_display");
   int displayNode(const NodePtr& n,
                   const std::string& ns="graph_display",
-                  const std::vector<double>& marker_color = {1,0,0,1.0},
-                  const bool& plot_state=false);
+                  const std::vector<double>& marker_color = {1,0,0,1.0});
   int displayNode(const NodePtr& n,
                   const int &static_id,
                   const std::string& ns="graph_display",
-                  const std::vector<double>& marker_color = {1,0,0,1.0},
-                  const bool& plot_state=false);
+                  const std::vector<double>& marker_color = {1,0,0,1.0});
   int displayConnection(const ConnectionPtr& conn,
                         const std::string& ns="graph_display",
-                        const std::vector<double>& marker_color= {1,0,0,1.0},
-                        const bool& plot_state=false);
+                        const std::vector<double>& marker_color= {1,0,0,1.0});
   int displayConnection(const ConnectionPtr& conn,
                         const int &static_id,
                         const std::string& ns="graph_display",
-                        const std::vector<double>& marker_color= {1,0,0,1.0},
-                        const bool& plot_state=false);
+                        const std::vector<double>& marker_color= {1,0,0,1.0});
   int displayPath(const PathPtr& path,
                   const std::string& ns="graph_display",
-                  const std::vector<double>& marker_color= {1,0,0,1.0},
-                  const bool& plot_state=false);
+                  const std::vector<double>& marker_color= {1,0,0,1.0});
   int displayPath(const PathPtr& path,
                   const int &static_id,
                   const std::string& ns="graph_display",
-                  const std::vector<double>& marker_color= {1,0,0,1.0},
-                  const bool& plot_state=false);
+                  const std::vector<double>& marker_color= {1,0,0,1.0});
   std::vector<int> displayPathAndWaypoints(const PathPtr& path,
                                            const std::string& ns="graph_display",
                                            const std::vector<double>& marker_color= {1,0,0,1.0},
