@@ -134,14 +134,12 @@ public:
                   const std::vector<double>& marker_color= {1,0,0,1.0});
   std::vector<int> displayPathAndWaypoints(const PathPtr& path,
                                            const std::string& ns="graph_display",
-                                           const std::vector<double>& marker_color= {1,0,0,1.0},
-                                           const bool& plot_state=false);
+                                           const std::vector<double>& marker_color= {1,0,0,1.0});
   std::vector<int> displayPathAndWaypoints(const PathPtr& path,
                                            const int &static_id_path,
                                            const int &static_id_wp,
                                            const std::string& ns="graph_display",
-                                           const std::vector<double>& marker_color= {1,0,0,1.0},
-                                           const bool& plot_state=false);
+                                           const std::vector<double>& marker_color= {1,0,0,1.0});
   int displayTree(const TreePtr& tree,
                   const std::string& ns="graph_display",
                   const std::vector<double>& marker_color= {1,0,0,1.0});
