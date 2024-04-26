@@ -1,96 +1,109 @@
-#include <ros/ros.h>
-#include <graph_core/graph/path.h>
-#include <graph_core/collision_checkers/cube_3d_collision_checker.h>
-#include <graph_display/graph_display.h>
-
+#include <graph_core/util.h>
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>
 #include <moveit/robot_state/conversions.h>
-#include <moveit_msgs/DisplayRobotState.h>
+#include <moveit_msgs/msg/display_robot_state.hpp>
+#include <ament_index_cpp/get_package_share_directory.hpp>
+
+class PlotIk : public rclcpp::Node
+{
+public:
+  PlotIk(const cnr_logger::TraceLoggerPtr& logger,
+         const std::string group_name,
+         const std::vector<std::string>& pose_names,
+         const rclcpp::NodeOptions & node_options)
+    : Node("plot_ik", node_options), group_name_(group_name), logger_(logger), pose_names_(pose_names)
+  {
+    pubs_.resize(pose_names_.size());
+    ik_solutions_.resize(pose_names_.size());
+
+    // Read ik
+    for (unsigned int ip=0;ip<pose_names_.size();ip++)
+    {
+      if(not graph::core::get_param(logger,"",pose_names_[ip],ik_solutions_[ip]))
+      {
+        CNR_ERROR(logger_,"Cannot get "<<pose_names_[ip]);
+        throw std::runtime_error("cannot get ik");
+      }
+      pubs_[ip]=this->create_publisher<moveit_msgs::msg::DisplayRobotState>(pose_names_.at(ip),1);
+    }
+
+    moveit::planning_interface::MoveGroupInterface move_group(this->shared_from_this(),group_name_);
+    robot_model_loader::RobotModelLoader robot_model_loader(this->shared_from_this(),"robot_description");
+    kinematic_model_ = robot_model_loader.getModel();
+  }
+
+  void plot_ik()
+  {
+    moveit_msgs::msg::RobotState state_msg;
+    moveit_msgs::msg::DisplayRobotState display_state_msg;
+    moveit::core::RobotStatePtr kinematic_state(new moveit::core::RobotState(kinematic_model_));
+
+    while (rclcpp::ok())
+    {
+      for (size_t ip=0;ip<pose_names_.size();ip++)
+      {
+        for (size_t idx=0;idx<ik_solutions_.at(ip).size();idx++)
+        {
+
+          kinematic_state->setJointGroupPositions(group_name_,ik_solutions_.at(ip).at(idx));
+
+          moveit::core::robotStateToRobotStateMsg(*kinematic_state,state_msg);
+          display_state_msg.state=state_msg;
+
+          pubs_[ip]->publish(display_state_msg);
+          rclcpp::sleep_for(std::chrono::milliseconds(1000));
+        }
+      }
+    }
+  }
+
+private:
+  std::string group_name_;
+  cnr_logger::TraceLoggerPtr logger_;
+  std::vector<std::string> pose_names_;
+  moveit::core::RobotModelPtr kinematic_model_;
+  std::vector<std::vector<std::vector<double>>> ik_solutions_;
+  std::vector<rclcpp::Publisher<moveit_msgs::msg::DisplayRobotState>::SharedPtr> pubs_;
+};
+
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "plot_paths");
-  ros::NodeHandle nh;
-  ros::NodeHandle pnh;
+  rclcpp::init(argc, argv);
 
-  std::string group_name;
-  if (!pnh.getParam("group_name",group_name))
+  // Load logger configuration file
+  std::string package_name = "graph_plot";
+  std::string package_path = ament_index_cpp::get_package_share_directory(package_name);
+
+  if (package_path.empty())
   {
-    ROS_ERROR("group_name is not defined");
-    return 0;
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("plot_ik"),"Failed to get path for package '" << package_name);
+    return 1;
   }
+
+  std::string logger_file = package_path+"/config/logger_param.yaml";
+  cnr_logger::TraceLoggerPtr logger = std::make_shared<cnr_logger::TraceLogger>("plot_ik",logger_file);
+
+  // Get the robot description
+  std::string param_ns = "";
+  std::string group_name;
+  if(not graph::core::get_param(logger,param_ns,"group_name",group_name))
+    return 1;
 
   std::vector<std::string> pose_names;
-  if (!pnh.getParam("pose_names",pose_names))
-  {
-    ROS_ERROR("pose_names is not defined");
-    return 0;
-  }
+  if(not graph::core::get_param(logger,param_ns,"pose_names",pose_names))
+    return 1;
 
-  moveit::planning_interface::MoveGroupInterface move_group(group_name);
-  robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
-  robot_model::RobotModelPtr       kinematic_model = robot_model_loader.getModel();
-  planning_scene::PlanningScenePtr planning_scene = std::make_shared<planning_scene::PlanningScene>(kinematic_model);
+  rclcpp::NodeOptions node_options;
+  node_options.automatically_declare_parameters_from_overrides(true);
+  auto node = std::make_shared<PlotIk>(logger,group_name,pose_names,node_options);
 
-  std::string what;
+  node->plot_ik();
 
-  robot_state::RobotStatePtr kinematic_state(new robot_state::RobotState(kinematic_model));
-  moveit_msgs::RobotState state_msg;
-  moveit_msgs::DisplayRobotState display_state_msg;
+  //  rclcpp::executors::MultiThreadedExecutor executor;
+  //  executor.add_node(node);
+  //  executor.spin();
 
-
-  std::vector<ros::Publisher> pubs(pose_names.size());
-  std::vector<std::vector<std::vector<double>>> ik_solutions(pose_names.size());
-
-  for (unsigned int ip=0;ip<pose_names.size();ip++)
-  {
-    XmlRpc::XmlRpcValue param;
-    if (!pnh.getParam(pose_names.at(ip),param))
-    {
-      ROS_ERROR("%s is not defined",pose_names.at(ip).c_str());
-      continue;
-    }
-    ros::Publisher state_pub=nh.advertise<moveit_msgs::DisplayRobotState>(pose_names.at(ip),1);
-
-    if (param.getType() != XmlRpc::XmlRpcValue::Type::TypeArray)
-    {
-      ROS_ERROR("%s is not not an array",pose_names.at(ip).c_str());
-      continue;
-    }
-    std::vector<std::vector<double>> solutions(param.size());
-    for (int idx=0;idx<param.size();idx++)
-    {
-      if (param[idx].getType() != XmlRpc::XmlRpcValue::Type::TypeArray)
-      {
-        ROS_ERROR("%s is not not an array of arrays",pose_names.at(ip).c_str());
-        return 0;
-      }
-      solutions.at(idx).resize(param[idx].size());
-      for (int iel=0;iel<param[idx].size();iel++)
-        solutions.at(idx).at(iel)=param[idx][iel];
-    }
-    ik_solutions.at(ip)=solutions;
-    pubs.at(ip)=state_pub;
-  }
-
-
-
-  while (ros::ok())
-  {
-    for (size_t ip=0;ip<pose_names.size();ip++)
-    {
-      for (size_t idx=0;idx<ik_solutions.at(ip).size();idx++)
-      {
-        kinematic_state->setJointGroupPositions(group_name, ik_solutions.at(ip).at(idx));
-
-        moveit::core::robotStateToRobotStateMsg(*kinematic_state,state_msg);
-        display_state_msg.state=state_msg;
-
-        pubs.at(ip).publish(display_state_msg);
-        ros::Duration(1).sleep();
-      }
-    }
-  }
   return 0;
 }
