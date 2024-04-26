@@ -5,7 +5,6 @@
 #include <cnr_logger/cnr_logger.h>
 #include <graph_core/metrics/euclidean_metrics.h>
 
-#include <rosparam_utilities/rosparam_utilities.h>
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>
@@ -73,7 +72,7 @@ void loop_animation()
   {
     std::vector<Eigen::VectorXd> waypoints;
 
-    if (!rosparam_utilities::getParam(pnh, path_name, waypoints, what))
+//    if (!rosparam_utilities::getParam(pnh, path_name, waypoints, what)) FIX
     {
       ROS_DEBUG("Path %s is not correct.", path_name.c_str());
       continue;

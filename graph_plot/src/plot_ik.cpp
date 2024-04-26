@@ -3,7 +3,6 @@
 #include <graph_core/collision_checkers/cube_3d_collision_checker.h>
 #include <graph_display/graph_display.h>
 
-#include <rosparam_utilities/rosparam_utilities.h>
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>

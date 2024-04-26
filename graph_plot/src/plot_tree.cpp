@@ -4,7 +4,6 @@
 #include <graph_display/graph_display.h>
 #include <graph_core/metrics/euclidean_metrics.h>
 
-#include <rosparam_utilities/rosparam_utilities.h>
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>
