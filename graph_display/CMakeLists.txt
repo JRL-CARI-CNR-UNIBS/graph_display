@@ -26,7 +26,6 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include
-  ${graph_core_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -35,5 +34,6 @@ add_library(${PROJECT_NAME}
   src/graph_display.cpp
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC
-  ${graph_core_LIBRARIES}
+  ${catkin_LIBRARIES}
+  graph_core::graph_core
 )

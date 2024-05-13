@@ -64,8 +64,6 @@ int main(int argc, char **argv)
     ROS_ERROR("%s/plot_tree_name is not defined",pnh.getNamespace().c_str());
     return 0;
   }
-  double maximum_distance=0.1;
-
 
   ros::Rate lp(1);
   while (ros::ok())
@@ -84,9 +82,10 @@ int main(int argc, char **argv)
         return 0;
       }
 
-      graph::core::TreePtr tree=graph::core::Tree::fromYAML(p,maximum_distance,checker,metrics,logger,true);
+      graph::core::TreePtr tree=graph::core::Tree::fromYAML(p,metrics,checker,logger);
       if (tree)
       {
+        tree->recheckCollision();
         display_path.clearMarkers();
         display_path.displayTree(tree);
 
