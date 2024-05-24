@@ -5,7 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rosparam_utilities
   graph_display
-  graph_ros1
+  moveit_ros_planning_interface
 )
 
 find_package(graph_core REQUIRED)
@@ -13,7 +13,7 @@ find_package(graph_core REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES graph_plot
- CATKIN_DEPENDS roscpp rosparam_utilities graph_display graph_ros1
+ CATKIN_DEPENDS roscpp rosparam_utilities graph_display moveit_ros_planning_interface
  DEPENDS graph_core
 )
 

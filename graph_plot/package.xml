@@ -19,10 +19,8 @@
   <build_depend>graph_display</build_depend>
   <build_export_depend>graph_display</build_export_depend>
   <exec_depend>graph_display</exec_depend>
-  <build_depend>graph_ros1</build_depend>
-  <build_export_depend>graph_ros1</build_export_depend>
-  <exec_depend>graph_ros1</exec_depend>
 
+  <depend>moveit_ros_planning_interface</depend>
 
   <export>
   </export>
