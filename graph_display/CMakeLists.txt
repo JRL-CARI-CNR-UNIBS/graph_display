@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-add_compile_options(-std=c++17)
+add_compile_options(-std=c++2a)
 project(graph_display)
 
 find_package(catkin REQUIRED COMPONENTS
