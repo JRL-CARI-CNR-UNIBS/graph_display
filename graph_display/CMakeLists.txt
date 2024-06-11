@@ -2,8 +2,11 @@ cmake_minimum_required(VERSION 3.8)
 project(graph_display)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+  add_compile_options(-funroll-loops -Wall -Ofast)
 endif()
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # set(CMAKE_BUILD_TYPE Debug)
 
@@ -16,24 +19,32 @@ find_package(visualization_msgs REQUIRED)
 find_package(moveit_visual_tools REQUIRED)
 find_package(tf2_eigen REQUIRED)
 
+set(DEPS_LIB
+    graph_core
+    )
+set(DEPS_TARGET
+    graph_core::graph_core
+    )
+set(ROS_DEPS
+    rclcpp
+    visualization_msgs
+    moveit_visual_tools
+    tf2_eigen
+    )
+
 add_library(${PROJECT_NAME} SHARED
   src/graph_display.cpp
 )
-ament_target_dependencies(${PROJECT_NAME} PUBLIC
-  rclcpp
-  graph_core
-  visualization_msgs
-  moveit_visual_tools
-  tf2_eigen
-)
-
+target_link_libraries(${PROJECT_NAME} PUBLIC ${DEPS_TARGET})
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
+ament_target_dependencies(${PROJECT_NAME} PUBLIC ${ROS_DEPS})
 
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
-ament_export_dependencies(rclcpp graph_core visualization_msgs moveit_visual_tools tf2_eigen)
+ament_export_dependencies(${DEPS_LIB} ${ROS_DEPS})
 
+# Install
 install(TARGETS ${PROJECT_NAME}
   EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
