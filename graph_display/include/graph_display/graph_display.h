@@ -78,7 +78,8 @@ protected:
                       const NetPtr& net,
                       std::vector<geometry_msgs::msg::Point> &points);
 public:
-  Display(const planning_scene::PlanningSceneConstPtr planning_scene,
+  Display(const rclcpp::Node::SharedPtr& node,
+          const planning_scene::PlanningSceneConstPtr planning_scene,
           const std::string& group_name,
           const std::string& last_link="");
 

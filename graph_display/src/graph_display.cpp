@@ -32,12 +32,13 @@ namespace graph
 namespace display
 {
 
-Display::Display(const planning_scene::PlanningSceneConstPtr planning_scene,
-                 const std::string& group_name,
-                 const std::string& last_link):
+Display::Display(const rclcpp::Node::SharedPtr &node,
+                 const planning_scene::PlanningSceneConstPtr planning_scene,
+                 const std::string& group_name, const std::string& last_link):
   planning_scene_(planning_scene),
   group_name_(group_name),
-  last_link_(last_link)
+  last_link_(last_link),
+  nh_(node)
 {
   if (last_link.empty())
     last_link_=planning_scene->getRobotModel()->getJointModelGroup(group_name)->getLinkModelNames().back();
@@ -50,6 +51,7 @@ Display::Display(const planning_scene::PlanningSceneConstPtr planning_scene,
   jmg_ = state_->getJointModelGroup(group_name_);
   joint_names_=jmg_->getActiveJointModelNames();
   joint_models_=jmg_->getActiveJointModels();
+
   marker_pub_ = nh_->create_publisher<visualization_msgs::msg::Marker>("/marker_visualization_topic", 1000);
   for (int idx=0;idx<4;idx++)
     clearMarkers();
@@ -579,7 +581,7 @@ void Display::displayTreeNode(const NodePtr &n,
       pose = tf2::toMsg(state_->getGlobalLinkTransform(last_link_));
       points.push_back(pose.position);
 
-//      state_->setJointGroupPositions(group_name_,conn->getChild()->getConfiguration());
+      //      state_->setJointGroupPositions(group_name_,conn->getChild()->getConfiguration());
       for (size_t ij=0;ij<joint_names_.size();ij++)
         state_->setJointPositions(joint_models_.at(ij),&conn->getChild()->getConfiguration()(ij));
 
