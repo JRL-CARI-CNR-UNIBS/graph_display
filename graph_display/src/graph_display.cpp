@@ -124,17 +124,6 @@ int Display::displayNode(const NodePtr &n,
   marker.color.b = marker_color.at(2);
   marker.color.a = marker_color.at(3);
 
-  geometry_msgs::msg::Pose pose;
-  pose.position.x = 0;
-  pose.position.y = 0;
-  pose.position.z = 0;
-
-  pose.orientation.x = 0;
-  pose.orientation.y = 0;
-  pose.orientation.z = 0;
-  pose.orientation.w = 1;
-  marker.pose = pose;
-
   marker_pub_->publish(marker);
   return marker.id;
 }
