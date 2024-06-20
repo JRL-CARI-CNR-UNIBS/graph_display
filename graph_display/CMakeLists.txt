@@ -1,15 +1,30 @@
-cmake_minimum_required(VERSION 3.0.2)
-add_compile_options(-std=c++2a)
+cmake_minimum_required(VERSION 3.16)
 project(graph_display)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+  # set(CMAKE_BUILD_TYPE "Debug")
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  if(CMAKE_BUILD_TYPE MATCHES "Release")
+    add_compile_options(-funroll-loops -Wall -Ofast -flto) #-O3
+  endif() 
+  if(CMAKE_BUILD_TYPE MATCHES "Debug")
+    add_compile_options(-Wall -g -Og)
+  endif() 
+endif()
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(graph_core REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   visualization_msgs
   moveit_visual_tools
   eigen_conversions
 )
-
-find_package(graph_core REQUIRED)
 
 catkin_package(
  INCLUDE_DIRS include
