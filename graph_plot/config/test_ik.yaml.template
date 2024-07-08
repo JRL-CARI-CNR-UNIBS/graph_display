@@ -1,4 +1,0 @@
-pose_names:
-- /go_to_location_server/desk1/approach/manipulator
-- /go_to_location_server/home/approach/manipulator
-- /go_to_location_server/warehouse2/approach/manipulator
