@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <graph_core/graph/subtree.h>
 #include <graph_core/graph/path.h>
 #include <visualization_msgs/msg/marker_array.h>
-#include <moveit/planning_scene/planning_scene.h>
+#include <moveit/planning_scene/planning_scene.hpp>
 #include <tf2_eigen/tf2_eigen.hpp>
 #include <moveit_visual_tools/moveit_visual_tools.h>
 #include <moveit_msgs/msg/display_trajectory.h>
